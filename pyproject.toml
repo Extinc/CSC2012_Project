@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "CSC2012_Project"
+version = "0.1.0"
+description = ""
+authors = ["VoidBlanc <angelic.noted_0g@icloud.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11.2"
+
+
+[tool.poetry.group.webapp.dependencies]
+flask = "^2.2.3"
+opencv-python = "^4.7.0.72"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
