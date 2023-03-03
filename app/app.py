@@ -1,39 +1,52 @@
-from threading import Thread
-
 from flask import Flask, render_template, Response
 import cv2
+import mediapipe as mp
+
 app = Flask(__name__)
+def generate():
+    camera = cv2.VideoCapture(0)
+    mpHands = mp.solutions.hands
+    hands = mpHands.Hands()
+    mpDraw = mp.solutions.drawing_utils
 
-camera = cv2.VideoCapture(0)
+    #Cv2 text initialize
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    org = (50, 50)
+    fontScale = 1
+    color = (0, 0, 0)
+    thickness = 2
 
-def capture_frame():
     while True:
-        ret, frame = camera.read()
-        # Do something with the frame,
-        global current_frame
-        current_frame = frame
+        success, image = camera.read()
+        imageRGB = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        results = hands.process(imageRGB)
 
-def generate_frame():
-    while True:
-        success, frame = camera.read()  # read the camera frame
-        if not success:
-            break
-        else:
-            ret, buffer = cv2.imencode('.jpg', frame)
-            frame = buffer.tobytes()
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
+        if results.multi_hand_landmarks:
+            for handlandmarks in results.multi_hand_landmarks:
+                mpDraw.draw_landmarks(image, handlandmarks, mpHands.HAND_CONNECTIONS)
+                thumbx = handlandmarks.landmark[mpHands.HandLandmark.THUMB_TIP].x
+                indexx = handlandmarks.landmark[mpHands.HandLandmark.INDEX_FINGER_TIP].x
+
+                # print("thumb: " + thumbx)
+                # print("index: " + indexx)
+                if thumbx > indexx:
+                    image = cv2.putText(image, 'I am a BAKA', org, font,
+                                        fontScale, color, thickness, cv2.LINE_AA)
+                    #cv2.putText(image, 'I am a baka.', (50,50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)
 
 
-@app.route('/')
-def hello_world():  # put application's code here
-    return render_template('index.html')
 
+        ret, buffer = cv2.imencode('.jpg', image)
+        frame = buffer.tobytes()
+        yield(b'--frame\r\n'
+              b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
 @app.route('/video_feed')
 def video_feed():
-    return Response(generate_frame(), mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(generate(), mimetype='multipart/x-mixed-replace; boundary=frame')
+@app.route('/')
+def index():
+    return render_template('index.html')
 
 if __name__ == '__main__':
-    Thread(target=capture_frame).start()
-    app.run(debug=True)
+    app.run(port=8001, debug=True)
