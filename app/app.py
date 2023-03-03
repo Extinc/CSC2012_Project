@@ -1,13 +1,16 @@
 from flask import Flask, render_template, Response
 import cv2
 import mediapipe as mp
-
+import numpy as np
 app = Flask(__name__)
 
 mp_holistic = mp.solutions.holistic
 mp_drawing = mp.solutions.drawing_utils
 
-
+def extract_keypoints(results):
+    lh = np.array([[res.x, res.y, res.z] for res in results.left_hand_landmarks.landmark]).flatten() if results.left_hand_landmarks else np.zeros(21*3)
+    rh = np.array([[res.x, res.y, res.z] for res in results.right_hand_landmarks.landmark]).flatten() if results.right_hand_landmarks else np.zeros(21*3)
+    return np.concatenate([lh, rh])
 def generate():
     """Generator function to capture video frames and yield them as byte strings."""
     cap = cv2.VideoCapture(0)  # Use 0 for default camera, or change to URL for IP camera
@@ -26,10 +29,16 @@ def generate():
             mp_drawing.draw_landmarks(image, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
             mp_drawing.draw_landmarks(image, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
             if results.left_hand_landmarks is not None:
-                print(f"lEFT ${results.left_hand_landmarks}")
+                # print(f"lEFT ${results.left_hand_landmarks}")
+                print(f"lEFT ${np.array([[res.x, res.y, res.z] for res in results.left_hand_landmarks.landmark]).flatten() if results.left_hand_landmarks else np.zeros(21*3)}")
 
             if results.right_hand_landmarks is not None:
-                print(f"right ${results.right_hand_landmarks}")
+                # print(f"right ${results.right_hand_landmarks}")
+                # data = extract_keypoints(results)
+                print(f"right ${np.array([[res.x, res.y, res.z] for res in results.right_hand_landmarks.landmark]).flatten() if results.right_hand_landmarks else np.zeros(21*3)}")
+
+
+
             # Convert the BGR image back to RGB
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
