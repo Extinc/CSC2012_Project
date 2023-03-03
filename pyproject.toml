@@ -12,12 +12,16 @@ python = "^3.11.2"
 [tool.poetry.group.webapp.dependencies]
 flask = "^2.2.3"
 opencv-python = "^4.7.0.72"
+numpy = "^1.24.2"
 
 
-
+[tool.poetry.group.mac]
+optional = true
 [tool.poetry.group.mac.dependencies]
 mediapipe-silicon = "^0.9.1"
 
+[tool.poetry.group.window]
+optional = true
 [tool.poetry.group.window.dependencies]
 mediapipe = "^0.9.1"
 
