@@ -6,14 +6,13 @@ authors = ["VoidBlanc <angelic.noted_0g@icloud.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.11.2"
+python = ">=3.8, <=3.11.2"
 
 
 [tool.poetry.group.webapp.dependencies]
 flask = "^2.2.3"
 opencv-python = "^4.7.0.72"
 numpy = "^1.24.2"
-
 
 [tool.poetry.group.mac]
 optional = true
