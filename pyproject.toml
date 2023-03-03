@@ -14,6 +14,13 @@ flask = "^2.2.3"
 opencv-python = "^4.7.0.72"
 
 
+
+[tool.poetry.group.mac.dependencies]
+mediapipe-silicon = "^0.9.1"
+
+[tool.poetry.group.window.dependencies]
+mediapipe = "^0.9.1"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
