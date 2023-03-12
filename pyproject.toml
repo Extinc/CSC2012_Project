@@ -6,7 +6,7 @@ authors = ["VoidBlanc <angelic.noted_0g@icloud.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.11.2"
+python = ">=3.8, <=3.11.2"
 
 
 [tool.poetry.group.webapp.dependencies]
@@ -14,16 +14,22 @@ flask = "^2.2.3"
 opencv-python = "^4.7.0.72"
 numpy = "^1.24.2"
 
-
 [tool.poetry.group.mac]
 optional = true
 [tool.poetry.group.mac.dependencies]
 mediapipe-silicon = "^0.9.1"
+tensorflow-macos = "^2.9.0"
+tensorflow-metal = "^0.5.0"
 
 [tool.poetry.group.window]
 optional = true
 [tool.poetry.group.window.dependencies]
 mediapipe = "^0.9.1"
+
+[tool.poetry.group.test]
+optional = true
+[tool.poetry.group.test.dependencies]
+jupyter = "^1.0.0"
 
 [build-system]
 requires = ["poetry-core"]
