@@ -13,7 +13,7 @@ from sklearn.metrics import multilabel_confusion_matrix, accuracy_score
 
 # %%
 DATA_PATH = "data"
-actions = ['a','b', 'c']
+actions = ['a','b', 'c','how are you']
 label_ids = {action: i for i, action in enumerate(actions)}
 
 # %%
@@ -69,19 +69,25 @@ print(train_labels)
 
 
 # %% Define the model architecture
-model = tf.keras.models.Sequential([
-    tf.keras.layers.Input(shape=(21, 3)),
-    tf.keras.layers.Flatten(),
-    tf.keras.layers.Dense(128, activation='relu'),
-    tf.keras.layers.Dense(len(actions), activation='softmax')
-])
-
+# model = tf.keras.models.Sequential([
+#     tf.keras.layers.Input(shape=(21, 3)),
+#     tf.keras.layers.Flatten(),
+#     tf.keras.layers.Dense(128, activation='relu'),
+#     tf.keras.layers.Dense(len(actions), activation='softmax')
+# ])
+model = Sequential()
+model.add(LSTM(64, return_sequences=True, activation='relu', input_shape=(21,3)))
+model.add(LSTM(128, return_sequences=True, activation='relu'))
+model.add(LSTM(64, return_sequences=False, activation='relu'))
+model.add(Dense(64, activation='relu'))
+model.add(Dense(32, activation='relu'))
+model.add(Dense(len(actions), activation='softmax'))
 
 # %%
-model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['categorical_accuracy'])
 
 # %% Train the model
-model.fit(train_hand_landmarks, train_labels, epochs=10, validation_data=(val_hand_landmarks, val_labels))
+model.fit(train_hand_landmarks, train_labels, epochs=2000, validation_data=(val_hand_landmarks, val_labels))
 
 # %%
 model.summary()
