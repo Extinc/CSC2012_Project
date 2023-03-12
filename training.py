@@ -10,7 +10,7 @@ from keras.models import Sequential
 from keras.layers import LSTM, Dense
 from keras.callbacks import TensorBoard
 from sklearn.metrics import multilabel_confusion_matrix, accuracy_score
-
+import os
 # %%
 DATA_PATH = "data"
 actions = ['a','b', 'c','how are you']
