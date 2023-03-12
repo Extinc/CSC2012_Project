@@ -7,8 +7,8 @@ from sklearn.model_selection import train_test_split
 from keras.utils import to_categorical
 from matplotlib import pyplot as plt
 from keras.models import Sequential
-from keras.layers import LSTM, Dense
-from keras.callbacks import TensorBoard
+from keras.layers import LSTM, Dense,SimpleRNN
+from keras.callbacks import TensorBoard, EarlyStopping
 from sklearn.metrics import multilabel_confusion_matrix, accuracy_score
 import os
 # %%
@@ -76,9 +76,9 @@ print(train_labels)
 #     tf.keras.layers.Dense(len(actions), activation='softmax')
 # ])
 model = Sequential()
-model.add(LSTM(64, return_sequences=True, activation='relu', input_shape=(21,3)))
-model.add(LSTM(128, return_sequences=True, activation='relu'))
-model.add(LSTM(64, return_sequences=False, activation='relu'))
+model.add(SimpleRNN(64, return_sequences=True, activation='relu', input_shape=(21,3)))
+model.add(SimpleRNN(128, return_sequences=True, activation='relu'))
+model.add(SimpleRNN(64, return_sequences=False, activation='relu'))
 model.add(Dense(64, activation='relu'))
 model.add(Dense(32, activation='relu'))
 model.add(Dense(len(actions), activation='softmax'))
@@ -87,7 +87,8 @@ model.add(Dense(len(actions), activation='softmax'))
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['categorical_accuracy'])
 
 # %% Train the model
-model.fit(train_hand_landmarks, train_labels, epochs=2000, validation_data=(val_hand_landmarks, val_labels))
+early_stopping = EarlyStopping(patience=50, restore_best_weights=True)
+model.fit(train_hand_landmarks, train_labels, epochs=200, validation_data=(val_hand_landmarks, val_labels), callbacks=[early_stopping])
 
 # %%
 model.summary()
@@ -99,7 +100,7 @@ test_loss, test_accuracy = model.evaluate(val_hand_landmarks, val_labels)
 print('Test accuracy:', test_accuracy)
 
 #%%
-model.save('hand_gesture_model.h5')
+model.save('hand_gesture_model_SIMPLERNN.h5')
 
 # %%
 hand_landmarks = np.array([[landmark.x, landmark.y, landmark.z] for landmark in results.multi_hand_landmarks[0].landmark]).flatten()
