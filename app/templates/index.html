@@ -12,6 +12,7 @@
             <button id="start_button">Start Recording</button>
             <button id="stop_button">Stop Recording</button>
             <input type="text" id="asl_sign" name="asl_sign">
+            <input type="text" id="user_id" name="user_id">
         </div>
         <div class="row">
             <div class="col-lg-8  offset-lg-2">
@@ -46,7 +47,8 @@
 
     startButton.addEventListener('click', () => {
         const asl_sign = document.getElementById('asl_sign').value;
-        fetch('/start_recording?asl_sign=' + encodeURIComponent(asl_sign));
+        const user_id = document.getElementById('user_id').value;
+        fetch('/start_recording?asl_sign=' + encodeURIComponent(asl_sign) + '&user_id=' + encodeURIComponent(user_id));
     })
     stopButton.addEventListener('click', () => {
         fetch('/stop_recording');

@@ -26,11 +26,12 @@ for asl_sign in actions:
     sign_files.sort()
     
     for file in sign_files:
-        if(file.endswith("label.npy")):
-            labels.append(np.load(os.path.join(sign_path, file)))
+        file_name, extension = os.path.splitext(file)
+        if (file_name.endswith("label") == False):
+            hand_landmarks.append(np.load(os.path.join(sign_path, f'{file_name}{extension}')))
+            labels.append(np.load(os.path.join(sign_path,f'{file_name}_label{extension}' )))           
         else:
-            hand_landmarks.append(np.load(os.path.join(sign_path, file)))
-
+            continue
         
 # %% Check 
 

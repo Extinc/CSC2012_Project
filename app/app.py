@@ -4,6 +4,8 @@ import mediapipe as mp
 import numpy as np
 import os
 import tensorflow as tf 
+import time
+
 app = Flask(__name__)
 
 DATA_PATH = os.path.join('data') 
@@ -11,7 +13,7 @@ mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
 recording = None
 asl_sign = ''
-count = 0
+user_id = ''
 
 actions = np.array(['a', 'b', 'c'])
 
@@ -136,20 +138,22 @@ def stop_recording_route():
 output = None
 
 def start_recording():
-    global recording, asl_sign,count
+    global recording, asl_sign,count,user_id
     asl_sign = request.args.get('asl_sign')
+    user_id = request.args.get('user_id')
+    print(user_id)
     recording = True
 
 def stop_recording():
-    global recording, hand_landmarks_all_frames, asl_sign, count, labels_all_frames
+    global recording, hand_landmarks_all_frames, asl_sign, labels_all_frames,user_id
     recording = False
     hand_landmarks_all_frames_np = np.array(hand_landmarks_all_frames)
     label_array = np.array(labels_all_frames)
-    np.save(f'{DATA_PATH}/{asl_sign}/{count}', hand_landmarks_all_frames_np)
-    np.save(f'{DATA_PATH}/{asl_sign}/{count}_label', label_array)
+    timestamp = int(time.time())
+    np.save(f'{DATA_PATH}/{asl_sign}/{user_id}_{timestamp}', hand_landmarks_all_frames_np)
+    np.save(f'{DATA_PATH}/{asl_sign}/{user_id}_{timestamp}_label', label_array)
     hand_landmarks_all_frames.clear()
     labels_all_frames.clear()
-    count += 1
 
 @app.route('/')
 def index():
