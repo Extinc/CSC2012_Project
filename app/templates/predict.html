@@ -55,15 +55,32 @@
     }
 
     
-    .disclaimer {
-        font-size: 40px;
-        color: white;
-    }
+    .circle img {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 50px;
+			height: 50px;
+			border-radius: 50%;
+			position: fixed;
+			top: 20px;
+			right: 20px;
+			cursor: pointer;
+		}
+
+		.circle:hover {
+			background-color: blue;
+		}
 
     </style>
 </head>
 
 <body>
+    <div class="circle">
+        <a href = "https://github.com/Extinc/CSC2012_Project">
+            <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="">
+        </a>
+    </div>
     <div class="container">
         <div class="row">
             <div class="center">
