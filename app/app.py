@@ -12,10 +12,10 @@ DATA_PATH = os.path.join('data')
 mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
 recording = None
-asl_sign = ''
+hand_sign = ''
 user_id = ''
 
-actions = np.array(['a', 'b', 'c'])
+actions = np.array(['a', 'b', 'c', 'how are you'])
 
 model = tf.keras.models.load_model('hand_gesture_model.h5')
 # Process each frame in the video stream
@@ -58,7 +58,7 @@ def collect_keypoints():
                         
                         hand_landmarks_all_frames.append(hand_landmark_tuples)
                         # hand_landmarks_all_frames.append(hand_landmarks)
-                        labels_all_frames.append(asl_sign)
+                        labels_all_frames.append(hand_sign)
 
             # Convert the BGR image back to RGB
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -138,20 +138,23 @@ def stop_recording_route():
 output = None
 
 def start_recording():
-    global recording, asl_sign,count,user_id
-    asl_sign = request.args.get('asl_sign')
+    global recording, hand_sign,count,user_id
+    hand_sign = request.args.get('asl_sign')
     user_id = request.args.get('user_id')
+    directory = f'{DATA_PATH}/{hand_sign}'
+    if not os.path.exists(directory):
+        os.makedirs(directory)
     print(user_id)
     recording = True
 
 def stop_recording():
-    global recording, hand_landmarks_all_frames, asl_sign, labels_all_frames,user_id
+    global recording, hand_landmarks_all_frames, hand_sign, labels_all_frames,user_id
     recording = False
     hand_landmarks_all_frames_np = np.array(hand_landmarks_all_frames)
     label_array = np.array(labels_all_frames)
     timestamp = int(time.time())
-    np.save(f'{DATA_PATH}/{asl_sign}/{user_id}_{timestamp}', hand_landmarks_all_frames_np)
-    np.save(f'{DATA_PATH}/{asl_sign}/{user_id}_{timestamp}_label', label_array)
+    np.save(f'{DATA_PATH}/{hand_sign}/{user_id}_{timestamp}', hand_landmarks_all_frames_np)
+    np.save(f'{DATA_PATH}/{hand_sign}/{user_id}_{timestamp}_label', label_array)
     hand_landmarks_all_frames.clear()
     labels_all_frames.clear()
 
