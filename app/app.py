@@ -1,31 +1,45 @@
+import io
+from math import fabs
 from flask import Flask, render_template, Response, request
 import cv2
-import mediapipe as mp
+from mediapipe.python.solutions import drawing_utils as mp_drawing
+from mediapipe.python.solutions import hands as mp_hands
 import numpy as np
 import os
 import tensorflow as tf 
 import time
+import requests
+import tempfile
 
 app = Flask(__name__)
 
 DATA_PATH = os.path.join('data') 
-mp_hands = mp.solutions.hands
-mp_drawing = mp.solutions.drawing_utils
+# mp_hands = mp.solutions.hands
+# mp_drawing = mp.solutions.drawing_utils
 recording = None
 hand_sign = ''
 user_id = ''
 
-actions = np.array(['a', 'b', 'c', 'how are you'])
 
-model = tf.keras.models.load_model('hand_gesture_model.h5')
+actions = np.array(['a','hello', 'I love you', 'my', 'n', 'name', 'thank', 'y', 'you'])
+
+model_retrieve = requests.get('http://0.0.0.0:8080/api/model/retrieve/')
+
+model = None
 # Process each frame in the video stream
 hand_landmarks_all_frames = []
 labels_all_frames = []
+
 def collect_keypoints():
     # create directory if it does not exist
     global count
     """Generator function to capture video frames and yield them as byte strings."""
-    cap = cv2.VideoCapture(0)  # Use 0 for default camera, or change to URL for IP camera
+    pipeline = (
+        "rtspsrc location=http://0.0.0.0:8001 latency=0 ! "
+        "rtph264depay ! h264parse ! avdec_h264 ! "
+        "videoconvert ! appsink"
+    )
+    cap = cv2.VideoCapture(pipeline, cv2.CAP_GSTREAMER)  # Use 0 for default camera, or change to URL for IP camera
     with mp_hands.Hands(
             max_num_hands=2,
             min_detection_confidence=0.5,
@@ -71,6 +85,7 @@ def collect_keypoints():
 
 
 
+
 def predict():
 
     global count
@@ -80,7 +95,7 @@ def predict():
             max_num_hands=2,
             min_detection_confidence=0.5,
             min_tracking_confidence=0.5) as hands:
-        
+        sentence = []
         while True:
             ret, frame = cap.read()
 
@@ -89,12 +104,13 @@ def predict():
 
             # Pass the RGB image through the Holistic model to get body landmark detections
             results = hands.process(image)
-
+            
+            
             # Draw landmarks on the image
             if results.multi_hand_landmarks:
                 for hand_landmarks in results.multi_hand_landmarks:
                     mp_drawing.draw_landmarks(image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
-
+                    
                     hand_landmarks = np.array([[landmark.x, landmark.y, landmark.z] for landmark in hand_landmarks.landmark])
                     hand_landmarks = tf.convert_to_tensor(hand_landmarks, dtype=tf.float32)
                     hand_landmarks = tf.expand_dims(hand_landmarks, axis=0)
@@ -104,9 +120,17 @@ def predict():
 
                     # Get the index of the class with the highest probability to get the predicted gesture label
                     predicted_label = actions[np.argmax(prediced)]
-
+                    if len(sentence) < 1 :
+                        sentence.append(predicted_label)
+                    if len(sentence) < 5 and len(sentence) > 0:
+                        if len(sentence)-1 > -1:
+                            if sentence[len(sentence)-1] != predicted_label:
+                                sentence.append(predicted_label)
+                    else:
+                        sentence = [] 
+                        sentence.append(predicted_label)
                     # Draw the predicted label on the video frame using OpenCV
-                    cv2.putText(image, predicted_label, (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+                    # cv2.putText(image, ' '.join(sentence), (100, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2, cv2.LINE_AA)
 
             # Convert the BGR image back to RGB
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -155,6 +179,7 @@ def stop_recording():
     timestamp = int(time.time())
     np.save(f'{DATA_PATH}/{hand_sign}/{user_id}_{timestamp}', hand_landmarks_all_frames_np)
     np.save(f'{DATA_PATH}/{hand_sign}/{user_id}_{timestamp}_label', label_array)
+
     hand_landmarks_all_frames.clear()
     labels_all_frames.clear()
 
@@ -168,5 +193,12 @@ def predictpage():
     return render_template('predict.html')
 
 
+
 if __name__ == '__main__':
-    app.run(port=8001, debug=True)
+    with tempfile.NamedTemporaryFile(suffix='.h5', delete=True) as temp:
+        temp.write(model_retrieve.content)
+        temp.flush()
+        model = tf.keras.models.load_model(temp.name, compile=False)
+        model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['categorical_accuracy'])
+
+    app.run()
