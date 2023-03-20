@@ -1,0 +1,13 @@
+name: csc2012app
+channels:
+  - defaults
+dependencies:
+  - python=3.10
+  - protobuf
+  - opencv
+  - numpy
+  - tensorflow
+  - ipykernel
+  - scikit-learn
+  - flask
+  - flask-cors

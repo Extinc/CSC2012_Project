@@ -71,8 +71,19 @@ create the virtual environment within your project directory:
 2. Navigate to the directory of your project that contains the `pyproject.toml` and `poetry.lock` file.
 3. Run the following command to install the package dependencies for the webapp group:
     ```commandline
-    poetry install --group webapp 
+    poetry install --group webapp
    ```
+    For Windows do this also
+
+    ```commandline
+    poetry install --group window
+   ```
+
+    For Mac do this also
+    ```commandline
+    poetry install --group mac
+   ```
+
    This will install the package dependencies that are defined in the
 `[tool.poetry.group.webapp.dependencies]` section of the `pyproject.toml` file under the
 `webapp` group.

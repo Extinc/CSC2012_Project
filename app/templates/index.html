@@ -7,13 +7,51 @@
 </head>
 
 <body>
-<div class="container">
-    <div class="row">
-        <div class="col-lg-8  offset-lg-2">
-            <h3 class="mt-5">Live Streaming</h3>
-            <img src="{{ url_for('video_feed') }}" width="100%">
+    <div class="container">
+        <div>
+            <button id="start_button">Start Recording</button>
+            <button id="stop_button">Stop Recording</button>
+            <input type="text" id="asl_sign" name="asl_sign">
+            <input type="text" id="user_id" name="user_id">
+        </div>
+        <div class="row">
+            <div class="col-lg-8  offset-lg-2">
+                <h3 class="mt-5">Live Streaming</h3>
+                <img src="{{ url_for('video_feed') }}" width="100%">
+            </div>
         </div>
     </div>
-</div>
+
 </body>
+
 </html>
+
+<script>
+    const startButton = document.getElementById('start_button');
+    const stopButton = document.getElementById('stop_button');
+
+
+    let isRecording = false;
+    let stream;
+
+    const startRecording = async () => {
+        isRecording = true;
+        stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+    }
+
+    const stopRecording = () => {
+        isRecording = false;
+        stream.getTracks().forEach(track => track.stop());
+    }
+
+    startButton.addEventListener('click', () => {
+        const asl_sign = document.getElementById('asl_sign').value;
+        const user_id = document.getElementById('user_id').value;
+        fetch('/start_recording?asl_sign=' + encodeURIComponent(asl_sign) + '&user_id=' + encodeURIComponent(user_id));
+    })
+    stopButton.addEventListener('click', () => {
+        fetch('/stop_recording');
+    });
+    console.log(startButton);
+</script>
