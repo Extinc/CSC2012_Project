@@ -1,20 +1,119 @@
 <html>
 
 <head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/static/predict.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sono:wght@200&display=swap" rel="stylesheet">
     <title>
         Camera
     </title>
+    <style>
+        body {
+            background: rgba(52, 53, 65);
+            align-items: center;
+            text-align: center;
+        }
+
+        .row {
+            display: flex;
+        }
+
+        .center {
+            margin: auto;
+        }
+
+        .mt-5 {
+            display: flex;
+            font-family: 'Sono', sans-serif;
+            font-size: 80px;
+            color: white;
+            overflow: hidden;
+            /* Ensures the content is not revealed until the animation */
+            border-right: .15em solid orange;
+            /* The typwriter cursor*/
+            white-space: nowrap;
+            /*Keeps the content on a single line */
+            margin: 0 auto;
+            /* Gives that scrolling effect as the typing happens */
+            letter-spacing: .15em;
+            /* Adjust as needed */
+            animation:
+                typing 2.5s steps(25, end),
+                blink-caret .75s step-end infinite;
+        }
+
+        .mt-5 {
+            display: inline-flex;
+        }
+
+        @keyframes typing {
+            from {
+                width: 0
+            }
+
+            to {
+                width: 100%
+            }
+        }
+
+        @keyframes blink-caret {
+
+            from,
+            to {
+                border-color: transparent
+            }
+
+            50% {
+                border-color: orange;
+            }
+        }
+
+        img {
+            display: block;
+            margin: auto;
+        }
+
+
+        .circle img {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+        }
+
+        .circle:hover {
+            background-color: blue;
+        }
+    </style>
 </head>
 
 <body>
+    <div class="circle">
+        <a href="https://github.com/Extinc/CSC2012_Project">
+            <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="">
+        </a>
+    </div>
     <div class="container">
-
         <div class="row">
-            <div class="col-lg-8  offset-lg-2">
-                <h3 class="mt-5">Live Streaming</h3>
-                <img src="{{ url_for('record_feed') }}" width="100%">
+            <div class="center">
+                <p class="mt-5">
+                    <b>SARA.ai_</b>
+                </p>
             </div>
         </div>
+
+        <div class="row">
+            <img src="{{ url_for('record_feed') }}" width="50%">
+        </div>
+
     </div>
 
 </body>

@@ -1,0 +1,75 @@
+services:
+  training:
+    build:
+      context: .
+      dockerfile: ./api/training/Dockerfile
+    environment:
+      S3_ACCESS_KEY: minioaccesskey
+      S3_SECRET_KEY: miniosecretkey
+      S3_URL: http://minio:9000
+      S3_Data_Bucket_Name: data
+    ports:
+      - 8003:80
+    depends_on:
+      - minio
+    networks:
+      - network-sharing
+  numpysaver:
+    build:
+      context: .
+      dockerfile: ./api/numpysaver/Dockerfile
+    environment:
+      S3_ACCESS_KEY: minioaccesskey
+      S3_SECRET_KEY: miniosecretkey
+      S3_URL: http://minio:9000
+      S3_BUCKET_NAME: data
+    ports:
+      - 8004:80
+    networks:
+      - network-sharing
+  
+  modelretrieval:
+    build:
+      context: .
+      dockerfile: ./api/modelretrieval/Dockerfile
+    environment:
+      S3_ACCESS_KEY: minioaccesskey
+      S3_SECRET_KEY: miniosecretkey
+      S3_URL: http://minio:9000
+      S3_Bucket_Name: model
+    ports:
+      - 8005:80
+    depends_on:
+      - minio
+    networks:
+      - network-sharing
+  minio:
+    image: minio/minio:latest
+    command: server /data
+    ports:
+      - "0.0.0.0:9000:9000"
+      - "0.0.0.0:9090:9090"
+    environment:
+      MINIO_ACCESS_KEY: minioaccesskey
+      MINIO_SECRET_KEY: miniosecretkey
+      MINIO_ADDRESS: '0.0.0.0:9000'
+      MINIO_CONSOLE_ADDRESS: '0.0.0.0:9090'
+    volumes:
+      - ./storage:/data
+    networks:
+      - network-sharing
+  gateway:
+    image: nginx:latest
+    container_name: nginx
+    volumes:
+      - ./gateway/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - 8080:80
+    depends_on:
+      - training
+      - minio
+    networks:
+      - network-sharing
+networks:
+  network-sharing:
+    driver: bridge
