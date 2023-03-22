@@ -1,113 +1,39 @@
 # CSC2012_Project
 
-# Setting up Poetry
+# Why use conda?
 
-Poetry is a dependency manager and a build tool for Python. This guide will walk you  
-through the steps required to set up Poetry on both macOS and Windows.
-<br/>
+For tensorflow pip install on m1 mac will have issue. So we use conda to install tensorflow.
 
-## Prerequisites
-Before we get started, you need to make sure that you have the following tools installed
-on your computer:
-- Python 3.6 or higher
-- pip (the Python package manager)
-- Homebrew package manager (for mac user)
 
-## Installation of Poetry
+# Step 1: Install Conda
 
-### macOS
-1. Install `pipx` using Homebrew:
-    ```zsh
-    brew install pipx
-    ```
-2. Ensure that `pipx` is in your system's PATH using the following command:
-    ```zsh
-    pipx ensurepath
-    ```
+To install Conda, you can follow the instructions on the [official website](https://conda.io/en/latest/miniconda.html). 
 
-3. Install Poetry using `pipx`:
-    ```zsh
-    pip install poetry
-    ```
-4. Once the installation is complete, run the following command to configure Poetry to
-create the virtual environment within your project directory:
-    ```zsh
-    poetry config virtualenvs.in-project true
-    ```
 
-5. Create a new virtual environment using Poetry:
-    ```commandline
-    poetry env use
-    ```
-    This will create a new virtual environment in your project directory.
+# Step 2: Update Conda
 
-7. Verify that Poetry is installed correctly by running the following command:
+Once you have installed Conda, you should update it to the latest version using the following command:
 
-    ```zsh
-    poetry --version
-    ```
+```
+conda update conda
+```
 
-### Windows
+# Step 3: Create a Conda environment
 
-1. Use pip to install Poetry by running the following command
-    ```commandline
-    pip install poetry
-    ```
+A Conda environment is a virtual environment where you can install packages without affecting the rest of your system. To create a new environment, run the following command:
 
-2. Once the installation is complete, run the following command to configure Poetry to
-create the virtual environment within your project directory:
-    ```commandline
-    poetry config virtualenvs.in-project true
-    ```
-3. Create a new virtual environment using Poetry:
-    ```commandline
-    poetry env use
-    ```
-    This will create a new virtual environment in your project directory.
+```
+conda env create -n myenv -f environment.yml
 
-## Installation of Package Dependencies
+OR
 
-1. Open the terminal or command prompt.
-2. Navigate to the directory of your project that contains the `pyproject.toml` and `poetry.lock` file.
-3. Run the following command to install the package dependencies for the webapp group:
-    ```commandline
-    poetry install --group webapp
-   ```
-    For Windows do this also
+conda env create -n myenv -f environment-silicon-mac.yml
+```
 
-    ```commandline
-    poetry install --group window
-   ```
+# Step 4 : Activate the environment
 
-    For Mac do this also
-    ```commandline
-    poetry install --group mac
-   ```
+To activate the environment, run the following command:
 
-   This will install the package dependencies that are defined in the
-`[tool.poetry.group.webapp.dependencies]` section of the `pyproject.toml` file under the
-`webapp` group.
-4. Verify that the package dependencies are installed correctly by running the following
-command:
-    ```commandline
-    poetry show
-    ```
-
-## Activating of Python Virtual Environment
-
-1. Open the terminal / command promp .
-2. Navigate to the directory of your project that contains the virtual environment.
-3. Run the following command to activate the virtual environment:
-    #### On macOS
-    ```zsh
-    source <venv>/bin/activate
-    ```
-   #### On windows
-    ```zsh
-    <venv>\Scripts\activate
-    ```
-4. Once the virtual environment is activated, you should see the name of the virtual
-environment in the command prompt. For example:
-    ```commandline
-    (venv) C:\Users\username\project>
-   ```
+```
+conda activate csc2012app
+```
