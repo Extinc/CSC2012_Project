@@ -1,5 +1,4 @@
 import io
-from math import fabs
 from flask import Flask, render_template, Response, request
 import cv2
 from mediapipe.python.solutions import drawing_utils as mp_drawing
@@ -22,8 +21,8 @@ user_id = ''
 
 
 actions = np.array(['a','hello', 'I love you', 'my', 'n', 'name', 'thank', 'y', 'you'])
-
-model_retrieve = requests.get('http://0.0.0.0:8080/api/model/retrieve/')
+base_url = 'http://0.0.0.0:8080/api/'
+model_retrieve = requests.get(f'{base_url}model/retrieve/')
 
 model = None
 # Process each frame in the video stream
@@ -34,17 +33,13 @@ def collect_keypoints():
     # create directory if it does not exist
     global count
     """Generator function to capture video frames and yield them as byte strings."""
-    pipeline = (
-        "rtspsrc location=http://0.0.0.0:8001 latency=0 ! "
-        "rtph264depay ! h264parse ! avdec_h264 ! "
-        "videoconvert ! appsink"
-    )
-    cap = cv2.VideoCapture(pipeline, cv2.CAP_GSTREAMER)  # Use 0 for default camera, or change to URL for IP camera
+
+    cap = cv2.VideoCapture(0)  # Use 0 for default camera, or change to URL for IP camera
     with mp_hands.Hands(
             max_num_hands=2,
             min_detection_confidence=0.5,
             min_tracking_confidence=0.5) as hands:
-        
+
         while True:
             ret, frame = cap.read()
 
@@ -130,7 +125,7 @@ def predict():
                         sentence = [] 
                         sentence.append(predicted_label)
                     # Draw the predicted label on the video frame using OpenCV
-                    # cv2.putText(image, ' '.join(sentence), (100, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2, cv2.LINE_AA)
+                    cv2.putText(image, ' '.join(sentence), (100, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2, cv2.LINE_AA)
 
             # Convert the BGR image back to RGB
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -178,8 +173,12 @@ def stop_recording():
     label_array = np.array(labels_all_frames)
     timestamp = int(time.time())
     np.save(f'{DATA_PATH}/{hand_sign}/{user_id}_{timestamp}', hand_landmarks_all_frames_np)
-    np.save(f'{DATA_PATH}/{hand_sign}/{user_id}_{timestamp}_label', label_array)
-
+    hand_landmarks_binary_file = io.BytesIO()   
+    label_binary_file = io.BytesIO()   
+    np.save(hand_landmarks_binary_file, hand_landmarks_all_frames_np)
+    np.save(label_binary_file, label_array)
+    requests.post(f'{base_url}numpy/save/{hand_sign}/{user_id}_{timestamp}.npy' , data=hand_landmarks_binary_file.getvalue())
+    requests.post(f'{base_url}numpy/save/{hand_sign}/{user_id}_{timestamp}_label.npy' , data=label_binary_file.getvalue())
     hand_landmarks_all_frames.clear()
     labels_all_frames.clear()
 
