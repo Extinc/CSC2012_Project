@@ -37,3 +37,6 @@ To activate the environment, run the following command:
 ```
 conda activate csc2012app
 ```
+
+# Credits:
+Learned from [HERE](https://github.com/nicknochnack/ActionDetectionforSignLanguage/blob/main/Action%20Detection%20Refined.ipynb)
