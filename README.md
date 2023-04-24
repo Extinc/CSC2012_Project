@@ -1,5 +1,8 @@
 # CSC2012_Project
 
+# SARA Introduction Video
+[![Watch the video](https://cdn.freebiesupply.com/logos/thumbs/1x/youtube-icon-logo.png)](https://youtu.be/w7QNSehx638)
+
 # Why use conda?
 
 For tensorflow pip install on m1 mac will have issue. So we use conda to install tensorflow.
